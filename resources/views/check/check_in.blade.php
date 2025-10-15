@@ -8,7 +8,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>พนักงาน - เช็คอิน/เช็คเอาท์</title>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    {{-- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> --}}
 </head>
 
 <body>
@@ -64,7 +64,7 @@
     </form> --}}
 
     {{-- SweetAlert แจ้งเตือน --}}
-    @if (session('success'))
+    {{-- @if (session('success'))
     <script>
     Swal.fire({
         title: 'สำเร็จ!',
@@ -92,7 +92,7 @@
     function noBack() {
         window.history.forward();
     }
-    </script>
+    </script> --}}
 
 </body>
 

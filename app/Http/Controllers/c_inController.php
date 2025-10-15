@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\c_in;
 use App\Models\Work;
+use App\Models\Employee;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
@@ -41,18 +42,18 @@ class c_inController extends Controller
             'check_in' => Carbon::now(),
         ]);
 
-    // กำหนดชั่วโมงทำงานเริ่มต้นเป็น 0 สำหรับการเช็คอิน
-    $workHours = 0;
-    $hourlyRate = 0; // กำหนดค่าเริ่มต้นหรือดึงจากที่อื่นหากมี
+        // ดึงค่า rate จากตาราง employee
+        $employee = Employee::where('user_id', $user->id)->first();
+        $hourlyRate = $employee->hourly_rate ?? 0;
 
-    Work::create([
-        'user_id' => $user->id,
-        'date' => Carbon::now()->toDateString(),
-        'work_hours' => $workHours,
-        'hourly_rate' => $hourlyRate,
-    ]);
-
-    return redirect()->back()->with('success', "เช็คอินเรียบร้อย! ชั่วโมงทำงาน: {$workHours}");
+        // เพิ่ม record ในตาราง Work
+        Work::create([
+            'user_id' => $user->id,
+            'date' => Carbon::now()->toDateString(),
+            'work_hours' => 0,
+            'hourly_rate' => $hourlyRate,
+            'total_amount' => 0,
+        ]);
 
         return redirect()->route('c_in.checkin')->with('success', 'เช็คอินเรียบร้อย! เวลา: ' . Carbon::now()->format('H:i:s'));
     }
@@ -77,7 +78,7 @@ class c_inController extends Controller
             return redirect()->route('c_in.checkin')->with('error', 'ไม่สามารถเช็คเอาท์ก่อนเวลาเช็คอินได้');
         }
 
-        // คำนวณเวลาทำงาน
+        // คำนวณเวลาทำงาน (ชั่วโมง)
         $workMinutes = $checkIn->diffInMinutes($checkOut);
         $workHours = round($workMinutes / 60, 2);
 
@@ -87,8 +88,30 @@ class c_inController extends Controller
             'work_hours' => $workHours,
         ]);
 
-        return redirect()->route('c_in.checkin')->with('success', 'เช็คเอาท์เรียบร้อย! ชั่วโมงทำงาน: ' . number_format($workHours, 2) . ' ชั่วโมง');
-    }
+        // ดึง rate จากตาราง employee
+        $employee = Employee::where('user_id', $user->id)->first();
+        $hourlyRate = $employee->hourly_rate ?? 0;
 
-    
+        // คำนวณยอดรวม
+        $totalPay = $workHours * $hourlyRate;
+
+        // อัปเดตตาราง Work ของวันนั้น
+        $work = Work::where('user_id', $user->id)
+            ->whereDate('date', $checkIn->toDateString())
+            ->latest('id')
+            ->first();
+
+        if ($work) {
+            $work->update([
+                'work_hours' => $workHours,
+                'hourly_rate' => $hourlyRate,
+                'total_amount' => $totalPay,
+            ]);
+        }
+
+        return redirect()->route('c_in.checkin')->with(
+            'success',
+            'เช็คเอาท์เรียบร้อย! ชั่วโมงทำงาน: ' . number_format($workHours, 2) . ' ชั่วโมง | รวมเงิน: ' . number_format($totalPay, 2) . ' บาท'
+        );
+    }
 }

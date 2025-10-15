@@ -32,7 +32,7 @@
         <input type="email" name="email" required>
 
         <label>รหัสผ่าน</label>
-        <input type="password" name="password" required>
+        <input type="password" name="password" min = "5"required>
 
         <label>เพศ</label>
         <select name="gender">

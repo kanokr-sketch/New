@@ -1,7 +1,19 @@
 @extends('layouts.main')
 
 @section('content')
-    <h2>หน้าจอเช็คอิน</h2>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+</head>
+<body>
+     <h2>หน้าจอเช็คอิน</h2>
 
     @if(session('error'))
         <div class="alert alert-danger">{{ session('error') }}</div>
@@ -40,3 +52,38 @@
         </div>
     </div>
 @endsection
+
+
+    @if (session('success'))
+    <script>
+    Swal.fire({
+        title: 'สำเร็จ!',
+        text: "{{ session('success') }}",
+        icon: 'success',
+        confirmButtonText: 'ตกลง'
+    });
+    </script>
+    @endif
+
+    @if (session('error'))
+    <script>
+    Swal.fire({
+        title: 'เกิดข้อผิดพลาด!',
+        text: "{{ session('error') }}",
+        icon: 'error',
+        confirmButtonText: 'ตกลง'
+    });
+    </script>
+    @endif
+
+    <script>
+    window.history.forward();
+
+    function noBack() {
+        window.history.forward();
+    }
+    </script>
+    
+</body>
+</html>
+   

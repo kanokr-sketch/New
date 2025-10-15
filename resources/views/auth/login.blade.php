@@ -53,6 +53,16 @@
             transition: 0.3s;
         }
 
+         input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+
         input[type="text"]:focus,
         input[type="password"]:focus {
             border-color: #2f855a;

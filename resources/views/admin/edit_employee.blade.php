@@ -29,29 +29,27 @@
         @csrf
         @method('PUT')
 
+        {{-- ชื่อ และอีเมล แสดงเฉย ๆ แก้ไม่ได้ --}}
         <label>ชื่อ - นามสกุล</label>
-        <input type="text" name="name" value="{{ $employee->name }}" required>
+        <input type="text" name="name" value="{{ $employee->name }}" readonly>
 
         <label>อีเมล</label>
-        <input type="email" name="email" value="{{ $employee->email }}" required>
+        <input type="email" name="email" value="{{ $employee->email }}" readonly>
 
+        {{-- ข้อมูลอื่น ๆ แสดงแต่แก้ไม่ได้ --}}
         <label>เพศ</label>
-        <select name="gender">
-            <option value="">-- เลือกเพศ --</option>
-            <option value="ชาย" {{ $employee->gender == 'ชาย' ? 'selected' : '' }}>ชาย</option>
-            <option value="หญิง" {{ $employee->gender == 'หญิง' ? 'selected' : '' }}>หญิง</option>
-            <option value="อื่นๆ" {{ $employee->gender == 'อื่นๆ' ? 'selected' : '' }}>อื่นๆ</option>
-        </select>
+        <input type="text" value="{{ $employee->gender }}" readonly>
 
         <label>เบอร์โทรศัพท์</label>
-        <input type="text" name="phone" value="{{ $employee->phone }}">
+        <input type="text" value="{{ $employee->phone }}" readonly>
 
         <label>วันเกิด</label>
-        <input type="date" name="birth_date" value="{{ $employee->birth_date }}">
+        <input type="date" value="{{ $employee->birth_date }}" readonly>
 
         <label>ที่อยู่</label>
-        <textarea name="address" rows="3">{{ $employee->address }}</textarea>
+        <textarea rows="3" readonly>{{ $employee->address }}</textarea>
 
+        {{-- ✅ แก้ไขได้เฉพาะส่วนนี้ --}}
         <label>แผนก (Department)</label>
         <input type="text" name="department" value="{{ $employee->department }}">
 
@@ -64,13 +62,8 @@
             <option value="admin" {{ $employee->role == 'admin' ? 'selected' : '' }}>Admin</option>
         </select>
 
-        <label>เปลี่ยนรูปโปรไฟล์</label>
+        <label>รูปโปรไฟล์</label>
         <input type="file" name="profile_image" accept="image/*">
-        @if($employee->profile_image)
-            <div style="margin-bottom:10px;">
-                <img src="{{ asset('storage/'.$employee->profile_image) }}" width="80" height="80" style="border-radius:50%;">
-            </div>
-        @endif
 
         <button type="submit">อัปเดตข้อมูล</button>
     </form>

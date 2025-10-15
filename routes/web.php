@@ -59,14 +59,22 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     // แสดงรายชื่อพนักงานทั้งหมด
     Route::get('/employees', [AdminController::class, 'listEmployees'])->name('admin.employee.list');
 
-    // สร้างพนักงานใหม่
+    // แสดงฟอร์มเพิ่มพนักงาน
     Route::get('/employees/create', [AdminController::class, 'createEmployee'])->name('admin.employee.create');
-    Route::post('/admin/employee/store', [AdminController::class, 'storeEmployee'])->name('admin.employee.store');
-    Route::post('/employees/store', [AdminController::class, 'storeEmployee'])->name('admin.employee.store');
+
+    // บันทึกพนักงานใหม่
+    Route::post('/employees', [AdminController::class, 'storeEmployee'])->name('admin.employee.store');
+
 
     // แก้ไขพนักงาน
     Route::get('/employees/{id}/edit', [AdminController::class, 'editEmployee'])->name('admin.employee.edit');
     Route::put('/employees/{id}', [AdminController::class, 'updateEmployee'])->name('admin.employee.update');
+    Route::put('/admin/employees/{id}', [AdminController::class, 'updateEmployee'])->name('admin.employee.update');
+
+    // บันทึกพนักงานใหม่
+    Route::post('/employees', [AdminController::class, 'storeEmployee'])->name('admin.employee.store');
+
+
 
     // ลบพนักงาน
     Route::delete('/employees/{id}', [AdminController::class, 'deleteEmployee'])->name('admin.employee.destroy');

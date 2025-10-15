@@ -24,18 +24,19 @@ class AdminController extends Controller
      */
     public function createEmployee()
     {
-        return view('admin.employee.create');
+        return view('admin.create_employee');
     }
 
     /**
      * บันทึกข้อมูลพนักงานใหม่
      */
     public function storeEmployee(Request $request)
-    {
+{
+    try {
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:6',
+            'password' => 'required|min:3',
             'role' => 'required|in:admin,employee',
             'gender' => 'nullable|string|in:ชาย,หญิง,อื่นๆ',
             'phone' => 'nullable|string|max:20',
@@ -60,8 +61,12 @@ class AdminController extends Controller
             'role' => $request->role
         ]);
 
+        if (!$user) {
+            throw new \Exception("สร้าง User ไม่สำเร็จ");
+        }
+
         // สร้าง Employee
-        Employee::create([
+        $employee = Employee::create([
             'user_id' => $user->id,
             'name' => $request->name,
             'email' => $request->email,
@@ -75,14 +80,59 @@ class AdminController extends Controller
             'profile_image' => $profilePath
         ]);
 
+        if (!$employee) {
+            throw new \Exception("สร้าง Employee ไม่สำเร็จ");
+        }
+
         return redirect()->route('admin.employee.list')->with('success', 'เพิ่มพนักงานเรียบร้อยแล้ว!');
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        return back()->withErrors($e->errors())->withInput();
+    } catch (\Exception $e) {
+        return back()->with('error', 'เกิดข้อผิดพลาด: ' . $e->getMessage())->withInput();
     }
+}
+
 
     public function salaryEmployeeForm()
 {
     $employees = Employee::all();
     return view('admin.salary_employee_form', compact('employees'));
 }
+
+public function editEmployee($id)
+{
+    $employee = \App\Models\Employee::findOrFail($id);
+    return view('admin.edit_employee', compact('employee'));
+}
+
+public function updateEmployee(Request $request, $id)
+{
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email',
+        'gender' => 'nullable|string|in:ชาย,หญิง,อื่นๆ',
+        'phone' => 'nullable|string|max:20',
+        'birth_date' => 'nullable|date',
+        'address' => 'nullable|string',
+        'department' => 'nullable|string|max:255',
+        'hourly_rate' => 'nullable|numeric|min:0',
+    ]);
+
+    $employee = Employee::findOrFail($id);
+    $employee->update($request->all());
+
+    // อัปเดตข้อมูลในตาราง users ด้วย (เพื่อ sync ชื่อ/อีเมล)
+    $user = User::find($employee->user_id);
+    if ($user) {
+        $user->update([
+            'name' => $request->name,
+            'email' => $request->email,
+        ]);
+    }
+
+    return redirect()->route('admin.employee.list')->with('success', 'อัปเดตข้อมูลพนักงานเรียบร้อยแล้ว!');
+}
+
 /**
      * ✅ คำนวณเงินเดือนรายเดือนจากตาราง work
      */

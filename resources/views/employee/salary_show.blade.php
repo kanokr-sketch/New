@@ -85,7 +85,7 @@
             </tr>
             @foreach($workHours as $wh)
                 <tr>
-                    <td>{{ date('d-m-Y', strtotime($wh->check_in)) }}</td>
+                    <td>{{ $wh['date'] }}</td>
                     <td>{{ $wh->work_hours}}</td>
                     <td>{{ number_format($employee->hourly_rate, 2) }}</td>
                     <td>{{ number_format($wh->work_hours * $employee->hourly_rate, 2) }}</td>
